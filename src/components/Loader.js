@@ -12,11 +12,9 @@ class Loader extends Component {
   componentWillUnmount = () => {};
 
   render() {
+    const {visible} = this.props;
     return (
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={this.props.visible}>
+      <Modal animationType="fade" transparent={true} visible={visible}>
         <View style={styles.loaderBody}>
           <Image source={require('../assets/loader.gif')} />
         </View>

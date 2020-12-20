@@ -61,6 +61,7 @@ class ShowTemperatureBody extends Component {
   componentWillUnmount = () => {};
 
   render() {
+    const {city} = this.props;
     return (
       <View style={styles.mainBody}>
         {this.state.totalData ? (
@@ -72,7 +73,7 @@ class ShowTemperatureBody extends Component {
                     {this.state.temperatureArray.shift()}{' '}
                   </Text>
                 )}
-              <Text style={styles.currentTempCitytitle}>{this.props.city} </Text>
+              <Text style={styles.currentTempCitytitle}>{city} </Text>
             </View>
             <View style={styles.upcomingDaysBody}>
               <FlatList
@@ -95,8 +96,7 @@ class ShowTemperatureBody extends Component {
             </View>
           </View>
         ) : (
-          <View><Text>abd</Text></View>
-          // <Loader visible={true} />
+          <Loader visible={true} />
         )}
       </View>
     );

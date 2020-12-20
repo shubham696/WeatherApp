@@ -19,6 +19,7 @@ import ShowTemperatureBody from '../components/ShowTemperatureBody';
 import HandleError from '../components/HandelError';
 import SplashScreen from '../pages/SplashScreen';
 import * as action from '../actions';
+import Strings from '../helpers/strings';
 
 var TAG = 'WelcomeScreen ';
 
@@ -57,8 +58,8 @@ class WelcomeScreen extends Component {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         {
-          title: 'Weather',
-          message: 'Need Location Permission to see Weather',
+          title: Strings.appName,
+          message: Strings.locationPermissionMessage,
           buttonNegative: 'Cancel',
           buttonPositive: 'OK',
         },
@@ -95,7 +96,7 @@ class WelcomeScreen extends Component {
   onLocationEnabledDeny = () => {
     try {
       Alert.alert(
-        'Weather',
+        Strings.appName,
         'Need Location to see Weather\nPlease press Yes to allow',
         [
           {text: 'NO ', onPress: this.exitApp},
@@ -105,15 +106,15 @@ class WelcomeScreen extends Component {
       );
       return true;
     } catch (error) {
-      console.error(TAG + 'onLocationEnabledDeny', error);
+      console.error(TAG + 'onPermissionDeny', error);
     }
   };
 
   onPermissionDeny = () => {
     try {
       Alert.alert(
-        'Weather',
-        'Need Location to see Weather\nPlease press Yes to allow',
+        Strings.appName,
+        `${Strings.locationPermissionMessage}\nPlease press Yes to allow`,
         [
           {text: 'NO ', onPress: this.exitApp},
           {text: 'YES ', onPress: () => Linking.openSettings()},
@@ -204,7 +205,9 @@ class WelcomeScreen extends Component {
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    //update the state 
+    if(prevProps.isLoading !== this.props.isLoading){
+      this.setState({loading: this.props.isLoading});
+    }
   };
 
   callAPIAgain = (value) => {
@@ -215,25 +218,24 @@ class WelcomeScreen extends Component {
   };
 
   render() {
-    console.log("temp   ",this.props.temperature)
+    const {temperature,city, error} = this.props;
     return (
       <SafeAreaView style={[styles.mainBody]}>
         {this.state.loading ? (
           <SplashScreen />
         ) : (
           [
-            this.props.error != null || this.props.temperature == undefined|null || this.props.temperature.length == 0 ? (
+            error != null || temperature == undefined|null || temperature.length == 0 ? (
               <HandleError callAPIAgain={this.callAPIAgain}  gotError={this.state.gotError}/>
             ) : (
-              <ShowTemperatureBody temperatureList={this.props.temperature} city={this.props.city}/>
-              ),
+              <ShowTemperatureBody temperatureList={temperature} city={city}/>
+            ),
           ]
         )}
       </SafeAreaView>
     );
   }
 }
-
 
 const mapStateToProps = (state) => ({
   temperature: state.temperatures,

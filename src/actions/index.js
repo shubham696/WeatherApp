@@ -4,35 +4,44 @@ import {
   REQUEST_BEGIN,
 } from '../helpers/actionType';
 import {create} from 'apisauce';
+import env from '../helpers/envConstanst';
+
+const api = create({
+  baseURL: env.baseUrl,
+});
 
 export const loadTemperature = (latitude, longitude) => {
   return (dispatch, getState) => {
-    var requestOptions = {
-      method: 'GET',
-      redirect: 'follow',
-    };
-    dispatch({
-      type: REQUEST_BEGIN,
-      payload: true,
-    });
-    fetch(
-      `http://api.openweathermap.org/data/2.5/forecast/daily?appid=c9d49310f8023ee2617a7634de23c2aa&lat=${latitude}&cnt=7&lon=${longitude}`,
-      requestOptions,
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        console.log('code   ', result.cod);
-        if (result.cod != 200) {
-          dispatch({type: ON_ERROR, payload: result.cod});
+    dispatch({type: REQUEST_BEGIN});
+    api
+      .get(
+        `/data/2.5/forecast/daily?appid=c9d49310f8023ee2617a7634de23c2aa&lat=${latitude}&cnt=7&lon=${longitude}`,
+      )
+      .then(function (response) {
+        if (response.data.cod != 200) {
+          dispatch({type: ON_ERROR, payload: response.data.cod});
         } else {
-          var array = [];
-          array.push[(result.list, result.city.name)];
           dispatch({
             type: ON_SUCCESSFULL_REQUEST,
-            payload: result,
+            payload: response.data,
           });
         }
       })
-      .catch((error) => console.log('error', error));
+      .catch(function (error) {
+        dispatch({type: ON_ERROR, payload: error});
+      });
+    // api.axiosInstance.interceptors.response.use(
+    //   function (response) {
+    //     if (response.data) {
+    //       // for NETWORK_ERROR data will be null
+    //     } else {
+    //       return api.axiosInstance.request(response.config);
+    //     }
+    //     return response;
+    //   },
+    //   function (error) {
+    //     return Promise.reject(error);
+    //   },
+    // );
   };
 };
