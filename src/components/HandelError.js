@@ -29,7 +29,7 @@ class HandleError extends Component {
         <TouchableOpacity
           style={styles.retryBody}
           activeOpacity={0.3}
-          onPress={() => this.callTheAPI()}>
+          onPress={this.callTheAPI}>
           <Text style={styles.retryTitle}>Retry{' '} </Text>
         </TouchableOpacity>
       </View>

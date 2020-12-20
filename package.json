@@ -15,6 +15,7 @@
     "apisauce": "^2.0.0",
     "react": "16.13.1",
     "react-native": "0.63.4",
+    "react-native-android-location-enabler": "^1.2.2",
     "react-redux": "^7.2.2",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0"

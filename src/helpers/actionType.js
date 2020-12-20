@@ -1,0 +1,3 @@
+export const REQUEST_BEGIN = 'REQUEST_BEGIN';
+export const ON_SUCCESSFULL_REQUEST = 'ON_SUCCESSFULL_REQUEST';
+export const ON_ERROR = 'ON_ERROR';

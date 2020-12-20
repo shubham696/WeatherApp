@@ -10,12 +10,15 @@ import {
   AppState,
 } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
+import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
+import RNAndroidLocationEnabler from 'react-native-android-location-enabler';//only need in andorid (ios start location when we get permission)
 
 import styles from '../styles/welcomeScreenStyle';
 import ShowTemperatureBody from '../components/ShowTemperatureBody';
 import HandleError from '../components/HandelError';
 import SplashScreen from '../pages/SplashScreen';
+import * as action from '../actions';
 
 var TAG = 'WelcomeScreen ';
 
@@ -42,7 +45,7 @@ class WelcomeScreen extends Component {
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
       );
       if (granted) {
-        this.getLocation();
+        this.askToStartTheLocation();
       } else {
         this.onPermissionDeny();
       }
@@ -61,12 +64,48 @@ class WelcomeScreen extends Component {
         },
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        this.getLocation();
+        this.askToStartTheLocation();
       } else {
         this.onPermissionDeny();
       }
     } catch (err) {
       console.error(TAG + 'askLocationPermission', err);
+    }
+  };
+
+  askToStartTheLocation = () => {
+    RNAndroidLocationEnabler.promptForEnableLocationIfNeeded({
+      interval: 10000,
+      fastInterval: 5000,
+    })
+      .then((data) => {
+        if (data === 'already-enabled') {
+          this.getLocation();
+        } else {
+          setTimeout(() => {
+            this.getLocation();
+          }, 1000);
+        }
+      })
+      .catch((error) => {
+        this.onLocationEnabledDeny();
+      });
+  };
+
+  onLocationEnabledDeny = () => {
+    try {
+      Alert.alert(
+        'Weather',
+        'Need Location to see Weather\nPlease press Yes to allow',
+        [
+          {text: 'NO ', onPress: this.exitApp},
+          {text: 'YES ', onPress: this.askToStartTheLocation},
+        ],
+        {cancelable: false},
+      );
+      return true;
+    } catch (error) {
+      console.error(TAG + 'onLocationEnabledDeny', error);
     }
   };
 
@@ -88,6 +127,11 @@ class WelcomeScreen extends Component {
   };
 
   getLocation = () => {
+    const locationConfig = {
+      skipPermissionRequests: false,
+      authorizationLevel: 'whenInUse',
+    };
+    Geolocation.setRNConfiguration(locationConfig);
     Geolocation.getCurrentPosition(
       (position) => {
         this.setState({
@@ -95,7 +139,7 @@ class WelcomeScreen extends Component {
           longitude: position.coords.longitude,
           loading: false,
         });
-        //call dispatch api
+        this.props.loadTemperature(this.state.latitude, this.state.longitude);
       },
       (error) => {
         //todo show default delhi weather
@@ -103,6 +147,9 @@ class WelcomeScreen extends Component {
         this.setState({
           loading: false,
         });
+        if(this.state.canGetError){
+          this.setState({gotError: true});
+        }
       },
       {
         enableHighAccuracy: false,
@@ -110,9 +157,6 @@ class WelcomeScreen extends Component {
         maximumAge: 10000,
       },
     );
-    if(this.state.canGetError){
-      this.setState({gotError: true});
-    }
   };
 
   componentDidMount = () => {
@@ -130,7 +174,10 @@ class WelcomeScreen extends Component {
   };
 
   handleAppStateChange = (nextAppState) => {
-    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+    if (
+      this.state.appState.match(/inactive|background/) &&
+      nextAppState === 'active'
+    ) {
       if (this.state.longitude === 0.0) {
         this.gotPermission;
       }
@@ -156,6 +203,10 @@ class WelcomeScreen extends Component {
     }
   };
 
+  componentDidUpdate = (prevProps, prevState) => {
+    //update the state 
+  };
+
   callAPIAgain = (value) => {
     if(value){
       this.setState({canGetError: true});
@@ -164,16 +215,38 @@ class WelcomeScreen extends Component {
   };
 
   render() {
+    console.log("temp   ",this.props.temperature)
     return (
       <SafeAreaView style={[styles.mainBody]}>
         {this.state.loading ? (
           <SplashScreen />
         ) : (
-          [this.state.gotError ? <HandleError callAPIAgain={this.callAPIAgain} gotError={this.state.gotError} /> : <ShowTemperatureBody />]
+          [
+            this.props.error != null || this.props.temperature == undefined|null || this.props.temperature.length == 0 ? (
+              <HandleError callAPIAgain={this.callAPIAgain}  gotError={this.state.gotError}/>
+            ) : (
+              <ShowTemperatureBody temperatureList={this.props.temperature} city={this.props.city}/>
+              ),
+          ]
         )}
       </SafeAreaView>
     );
   }
 }
 
-export default WelcomeScreen;
+
+const mapStateToProps = (state) => ({
+  temperature: state.temperatures,
+  isLoading: state.isLoading,
+  error: state.error,
+  city: state.city
+});
+
+function mapDispatchToProps(dispatch) {
+  return {
+    loadTemperature: (latitude, longitude) =>
+      dispatch(action.loadTemperature(latitude, longitude)),
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(WelcomeScreen);
