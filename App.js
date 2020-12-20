@@ -9,13 +9,13 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import WelcomeScreen from "./src/pages/welcomeScreen";
+import WelcomeScreen from './src/pages/welcomeScreen';
 
 const App: () => React$Node = () => {
   return (
-    <View style={{flex: 1}}>
-      <WelcomeScreen />
-    </View>
+      <View style={{flex: 1}}>
+        <WelcomeScreen />
+      </View>
   );
 };
 

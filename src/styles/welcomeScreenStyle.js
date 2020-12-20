@@ -47,4 +47,14 @@ export default styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#C8C8C8',
   },
+  splashBody: {
+    flex: 1,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imgSize: {
+    width: 200,
+    height: 200,
+  },
 });

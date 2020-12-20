@@ -1,12 +1,11 @@
 import {StyleSheet} from 'react-native';
-import Colors from '../helpers/colors';
 
 const styles = StyleSheet.create({
   loaderBody: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: Colors.white,
-    alignSelf: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.2)',
   },
 });
 

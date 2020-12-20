@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Image} from 'react-native';
+import {View, Image, Modal} from 'react-native';
 import styles from '../styles/loaderStyle';
 
 class Loader extends Component {
@@ -13,9 +13,14 @@ class Loader extends Component {
 
   render() {
     return (
-      <View style={[styles.loaderBody]}>
-        <Image source={require('../assets/loader.gif')} />
-      </View>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={this.props.visible}>
+        <View style={styles.loaderBody}>
+          <Image source={require('../assets/loader.gif')} />
+        </View>
+      </Modal>
     );
   }
 }

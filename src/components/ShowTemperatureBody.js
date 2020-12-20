@@ -23,8 +23,8 @@ class ShowTemperatureBody extends Component {
     return (
       <View style={styles.mainBody}>
         <View style={styles.titleBody}>
-          <Text style={styles.currentTemptitle}>10 </Text>
-          <Text style={styles.currentTempCitytitle}>Delhi </Text>
+          <Text style={styles.currentTemptitle}>10{' '} </Text>
+          <Text style={styles.currentTempCitytitle}>Delhi{' '} </Text>
         </View>
         <View style={styles.upcomingDaysBody}>
           <FlatList
@@ -32,9 +32,9 @@ class ShowTemperatureBody extends Component {
             data={this.state.array}
             renderItem={({item}) => (
               <View style={styles.upcomingDaysBox}>
-                <Text>{item}</Text>
+                <Text>{item}{' '}</Text>
                 <View style={styles.upcomingDaysTempTitle}>
-                  <Text>8 </Text>
+                  <Text>8{' '} </Text>
                 </View>
               </View>
             )}
